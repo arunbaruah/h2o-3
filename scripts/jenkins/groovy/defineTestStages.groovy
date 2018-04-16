@@ -42,7 +42,8 @@ def call(final pipelineContext) {
     ],
     [
       stageName: 'Java 8 Smoke', target: 'test-junit-smoke-jenkins', javaVersion: 8, timeoutValue: 20,
-      component: pipelineContext.getBuildConfig().COMPONENT_JAVA
+      component: pipelineContext.getBuildConfig().COMPONENT_JAVA,
+      nodeLabel: pipelineContext.getBuildConfig().getMediumTierNodeLabel()
     ],
      [
        stageName: 'Java 10 Smoke', target: 'test-junit-10-smoke-jenkins', javaVersion: 10, timeoutValue: 20,
@@ -66,7 +67,8 @@ def call(final pipelineContext) {
     ],
     [
       stageName: 'Py2.7 Demos', target: 'test-py-demos', pythonVersion: '2.7',
-      timeoutValue: 30, component: pipelineContext.getBuildConfig().COMPONENT_PY
+      timeoutValue: 30, component: pipelineContext.getBuildConfig().COMPONENT_PY,
+      nodeLabel: pipelineContext.getBuildConfig().getMediumTierNodeLabel()
     ],
     [
       stageName: 'Py2.7 Init Java 7', target: 'test-py-init', pythonVersion: '2.7', javaVersion: 7,
@@ -146,7 +148,8 @@ def call(final pipelineContext) {
     ],
     [
       stageName: 'R3.4 Booklets', target: 'test-r-booklets', rVersion: '3.4.1',
-      timeoutValue: 50, component: pipelineContext.getBuildConfig().COMPONENT_R
+      timeoutValue: 50, component: pipelineContext.getBuildConfig().COMPONENT_R,
+      nodeLabel: pipelineContext.getBuildConfig().getMediumTierNodeLabel()
     ],
     [
       stageName: 'R3.4 Demos Small', target: 'test-r-demos-small', rVersion: '3.4.1',
@@ -166,7 +169,8 @@ def call(final pipelineContext) {
     ],
     [
       stageName: 'R3.4 Demos Medium-large', target: 'test-r-demos-medium-large', rVersion: '3.4.1',
-      timeoutValue: 140, component: pipelineContext.getBuildConfig().COMPONENT_R
+      timeoutValue: 140, component: pipelineContext.getBuildConfig().COMPONENT_R,
+      nodeLabel: pipelineContext.getBuildConfig().getMediumTierNodeLabel()
     ],
     [
       stageName: 'INFO Check', target: 'test-info',
@@ -178,7 +182,8 @@ def call(final pipelineContext) {
     ],
     [
       stageName: 'Java 8 JUnit', target: 'test-junit-jenkins', pythonVersion: '2.7', javaVersion: 8,
-      timeoutValue: 180, component: pipelineContext.getBuildConfig().COMPONENT_JAVA, additionalTestPackages: [pipelineContext.getBuildConfig().COMPONENT_PY]
+      timeoutValue: 180, component: pipelineContext.getBuildConfig().COMPONENT_JAVA, additionalTestPackages: [pipelineContext.getBuildConfig().COMPONENT_PY],
+      nodeLabel: pipelineContext.getBuildConfig().getMediumTierNodeLabel()
     ],
     [
       stageName: 'Java 8 AutoML JUnit', target: 'test-junit-automl-jenkins', pythonVersion: '2.7', javaVersion: 8,
@@ -253,7 +258,8 @@ def call(final pipelineContext) {
   def MASTER_STAGES = [
     [
       stageName: 'R3.4 Datatable', target: 'test-r-datatable', rVersion: '3.4.1',
-      timeoutValue: 40, component: pipelineContext.getBuildConfig().COMPONENT_R
+      timeoutValue: 40, component: pipelineContext.getBuildConfig().COMPONENT_R,
+      nodeLabel: pipelineContext.getBuildConfig().getMediumTierNodeLabel()
     ],
     [
       stageName: 'Flow Headless Small', target: 'test-flow-headless-small',
