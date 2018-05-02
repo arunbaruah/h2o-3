@@ -70,6 +70,7 @@ def call(final pipelineContext) {
                                     }
                                 }
                             } finally {
+                                writeFile(file: 'h2o-3/build-container.log', text: containerLog(name: 'h2o-3-container', returnLog: true))
                                 archiveArtifacts "**/*.log, **/out.*, **/*py.out.txt, **/java*out.txt, **/status.*"
                                 pipelineContext.getBuildConfig().TEST_PACKAGES_COMPONENTS.each { component ->
                                     if (pipelineContext.getBuildConfig().stashComponent(component)) {
