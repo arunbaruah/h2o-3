@@ -7,9 +7,6 @@ source("../../../scripts/h2o-r-test-setup.R")
 ##
 
 
-
-
-
 test.linkFunctions <- function() {
 
 	print("Read in prostate data.")
@@ -24,9 +21,9 @@ test.linkFunctions <- function() {
 	R.formula = (R.data[,"GLEASON"]~.) 
 
 	print("Create models with canonical link: LOG")
+	browser()
 	model.h2o.poisson.log <- h2o.glm(x=myX, y=myY, training_frame=h2o.data, family="poisson", link="log",alpha=0.5, lambda=0, nfolds=0)
 	model.R.poisson.log <- glm(formula=R.formula, data=R.data[,2:9], family=poisson(link=log), na.action=na.omit)
-	
 	print("Compare model deviances for link function log")
 	deviance.h2o.log = model.h2o.poisson.log@model$training_metrics@metrics$residual_deviance / model.h2o.poisson.log@model$training_metrics@metrics$null_deviance
 	deviance.R.log = deviance(model.R.poisson.log)  / model.h2o.poisson.log@model$training_metrics@metrics$null_deviance
@@ -39,7 +36,9 @@ test.linkFunctions <- function() {
 
 	print("Create models with link: IDENTITY")
 	model.h2o.poisson.identity <- h2o.glm(x=myX, y=myY, training_frame=h2o.data, family="poisson", link="identity",alpha=0.5, lambda=0, nfolds=0)
-	model.R.poisson.identity <- glm(formula=R.formula, data=R.data[,2:9], family=poisson(link=identity), na.action=na.omit)
+  browser()
+		predictF <- h2o.predict(model.h2o.poisson.identity, h2o.data)
+		model.R.poisson.identity <- glm(formula=R.formula, data=R.data[,2:9], family=poisson(link=identity), na.action=na.omit)
 	
 	print("Compare model deviances for link function identity")
 	deviance.h2o.identity = model.h2o.poisson.identity@model$training_metrics@metrics$residual_deviance / model.h2o.poisson.identity@model$training_metrics@metrics$null_deviance

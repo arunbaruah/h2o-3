@@ -592,7 +592,7 @@ def write_syn_floating_point_dataset_glm(csv_training_data_filename, csv_validat
                                          max_p_value, min_p_value, max_w_value, min_w_value, noise_std, family_type,
                                          valid_row_count, test_row_count, class_number=2,
                                          class_method=('probability', 'probability', 'probability'),
-                                         class_margin=[0.0, 0.0, 0.0]):
+                                         class_margin=[0.0, 0.0, 0.0], link='identity', invTheta=1):
     """
     Generate random data sets to test the GLM algo using the following steps:
     1. randomly generate the intercept and weight vector;
@@ -645,18 +645,18 @@ def write_syn_floating_point_dataset_glm(csv_training_data_filename, csv_validat
     if len(csv_training_data_filename) > 0:
         generate_training_set_glm(csv_training_data_filename, row_count, col_count, min_p_value, max_p_value, data_type,
                                   family_type, noise_std, weights,
-                                  class_method=class_method[0], class_margin=class_margin[0], weightChange=True)
+                                  class_method=class_method[0], class_margin=class_margin[0], weightChange=True, link=link, invTheta=invTheta)
 
     # generate validation data set
     if len(csv_validation_data_filename) > 0:
         generate_training_set_glm(csv_validation_data_filename, valid_row_count, col_count, min_p_value, max_p_value,
                                   data_type, family_type, noise_std, weights,
-                                  class_method=class_method[1], class_margin=class_margin[1])
+                                  class_method=class_method[1], class_margin=class_margin[1], link=link, invTheta=invTheta)
     # generate test data set
     if len(csv_test_data_filename) > 0:
         generate_training_set_glm(csv_test_data_filename, test_row_count, col_count, min_p_value, max_p_value,
                                   data_type, family_type, noise_std, weights,
-                                  class_method=class_method[2], class_margin=class_margin[2])
+                                  class_method=class_method[2], class_margin=class_margin[2], link=link, invTheta=invTheta)
 
 
 def write_syn_mixed_dataset_glm(csv_training_data_filename, csv_training_data_filename_true_one_hot,
@@ -774,14 +774,14 @@ def generate_weights_glm(csv_weight_filename, col_count, data_type, min_w_value,
     """
 
     # first generate random intercept and weight
-    if 'gaussian' in family_type.lower():
+    if ('gaussian' in family_type.lower()) or ('negbinomial' in family_type.lower()):
         if data_type == 1:     # generate random integer intercept/weight
             weight = np.random.random_integers(min_w_value, max_w_value, [col_count+1, 1])
         elif data_type == 2:   # generate real intercept/weights
             weight = np.random.uniform(min_w_value, max_w_value, [col_count+1, 1])
         else:
             assert False, "dataType must be 1 or 2 for now."
-    elif ('binomial' in family_type.lower()) or ('multinomial' in family_type.lower()
+    elif ('binomial' == family_type.lower()) or ('multinomial' in family_type.lower()
                                                  or ('ordinal' in family_type.lower())):
         if 'binomial' in family_type.lower():  # for binomial, only need 1 set of weight
             class_number -= 1
@@ -809,12 +809,12 @@ def generate_weights_glm(csv_weight_filename, col_count, data_type, min_w_value,
             for indP in range(1,num_pred):
                 weight[indP,index] = weight[indP,0] # make sure betas for all classes are the same
 
-    np.savetxt(csv_weight_filename, weight.transpose(), delimiter=",")
+  #  np.savetxt(csv_weight_filename, weight.transpose(), delimiter=",")
     return weight
 
 
 def generate_training_set_glm(csv_filename, row_count, col_count, min_p_value, max_p_value, data_type, family_type,
-                              noise_std, weight, class_method='probability', class_margin=0.0, weightChange=False):
+                              noise_std, weight, class_method='probability', class_margin=0.0, weightChange=False,link='identity', invTheta=1, seed=12345):
     """
     Generate supervised data set given weights for the GLM algo.  First randomly generate the predictors, then
     call function generate_response_glm to generate the corresponding response y using the formula: y = w^T x+b+e
@@ -857,7 +857,8 @@ def generate_training_set_glm(csv_filename, row_count, col_count, min_p_value, m
 
     # generate the response vector to the input predictors
     response_y = generate_response_glm(weight, x_mat, noise_std, family_type,
-                                       class_method=class_method, class_margin=class_margin, weightChange=weightChange)
+                                       class_method=class_method, class_margin=class_margin, 
+                                       weightChange=weightChange, link=link, invTheta=invTheta, seed=seed)
 
     # for family_type = 'multinomial' or 'binomial', response_y can be -ve to indicate bad sample data.
     # need to delete this data sample before proceeding
@@ -1060,7 +1061,7 @@ def generate_and_save_mixed_glm(csv_filename, x_mat, enum_level_vec, enum_col, t
 
     # for familyType = 'multinomial' or 'binomial', response_y can be -ve to indicate bad sample data.
     # need to delete this before proceeding
-    if ('multinomial' in family_type.lower()) or ('binomial' in family_type.lower()):
+    if ('multinomial' in family_type.lower()) or ('binomial' == family_type.lower()):
         if 'threshold' in class_method.lower():
             (x_mat,response_y) = remove_negative_response(x_mat, response_y)
 
@@ -1162,7 +1163,7 @@ def one_hot_encoding(enum_level):
 
 
 def generate_response_glm(weight, x_mat, noise_std, family_type, class_method='probability',
-                          class_margin=0.0, weightChange=False, even_distribution=True):
+                          class_margin=0.0, weightChange=False, even_distribution=True, link='identity', invTheta=1, seed=12345):
     """
     Generate response vector given weight matrix, predictors matrix for the GLM algo.
 
@@ -1232,17 +1233,50 @@ def generate_response_glm(weight, x_mat, noise_std, family_type, class_method='p
         return discrete_y
 
     # added more to form Multinomial response
-    if ('multinomial' in family_type.lower()) or ('binomial' in family_type.lower()):
+    if ('multinomial' in family_type.lower()) or ('binomial' == family_type.lower()):
         temp_mat = np.exp(response_y)   # matrix of n by K where K = 1 for binomials
-        if 'binomial' in family_type.lower():
+        if 'binomial' == family_type.lower():
             ntemp_mat = temp_mat + 1
             btemp_mat = temp_mat / ntemp_mat
             temp_mat = np.concatenate((1-btemp_mat, btemp_mat), axis=1)    # inflate temp_mat to 2 classes
 
         response_y = derive_discrete_response(temp_mat, class_method, class_margin, family_type)
+    elif ('negbinomial' in family_type.lower()):
+        response_y = generate_negbinomial_response(response_y, link, invTheta, seed)        
 
     return response_y
 
+def generate_negbinomial_response(response_y, link, invTheta, seed=12345):
+    num_resp = len(response_y)
+    import numpy as np
+    np.random.seed(seed)
+    yunif = np.random.uniform(0,1,num_resp)
+    for val in range(num_resp):
+        new_y = find_negbinomial_y(yunif[val], response_y[val], link, invTheta)
+        response_y[val]=new_y
+    return response_y    
+
+def find_negbinomial_y(yprob, m, link, r):
+    import scipy.misc
+    val = 0
+    cdf = 0
+    max_val = 1000000
+    if (link=='identity'):
+        me = m
+    else:
+        me = math.exp(m)
+    p = 1.0/(1+me*r)  
+    oneMp = 1.0-p
+    while True:
+        cdf = cdf + scipy.misc.comb(r+val-1,val)*math.pow(p,r)*math.pow(oneMp,val)
+        if (cdf >= yprob):
+            return val
+        else:
+            val = val + 1
+        
+        if (val > max_val):
+            return max_val
+        
 
 def derive_discrete_response(prob_mat, class_method, class_margin, family_type='binomial'):
     """

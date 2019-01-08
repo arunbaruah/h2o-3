@@ -613,11 +613,11 @@ public abstract class Model<M extends Model<M,P,O>, P extends Model.Parameters, 
     /** Columns used in the model and are used to match up with scoring data
      *  columns.  The last name is the response column name (if any). */
     public String _names[];
-
+    
     public void setNames(String[] names) {
       _names = names;
     }
-
+    
     public String _origNames[]; // only set if ModelBuilder.encodeFrameCategoricals() changes the training frame
 
     /** Categorical/factor mappings, per column.  Null for non-categorical cols.
@@ -845,6 +845,10 @@ public abstract class Model<M extends Model<M,P,O>, P extends Model.Parameters, 
    */
   public double deviance(double w, double y, double f) {
     return _dist.deviance(w, y, f);
+  }
+
+  public double likelihood(double w, double y, double f) {
+    return 0.0; // place holder.  This function is overridden in GLM.
   }
 
   public ScoringInfo[] scoring_history() { return scoringInfo; }
