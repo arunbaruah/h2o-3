@@ -30,22 +30,23 @@ def call(final pipelineContext, final stageConfig) {
                 installRPackage(h2oFolder)
             }
 
-        makeTarget(pipelineContext) {
-            preBuildAction = stageConfig.preBuildAction
-            customBuildAction = stageConfig.customBuildAction
-            postSuccessfulBuildAction = stageConfig.postSuccessfulBuildAction
-            postFailedBuildAction = stageConfig.postFailedBuildAction
-            postSuccessfulBuildAction = stageConfig.postSuccessfulBuildAction
-            postBuildAction = stageConfig.postBuildAction
-            target = stageConfig.target
-            hasJUnit = stageConfig.hasJUnit
-            h2o3dir = h2oFolder
-            archiveAdditionalFiles = stageConfig.archiveAdditionalFiles
-            excludeAdditionalFiles = stageConfig.excludeAdditionalFiles
-            makefilePath = stageConfig.makefilePath
-            archiveFiles = stageConfig.archiveFiles
-            activatePythonEnv = stageConfig.activatePythonEnv
-            javaVersion = stageConfig.javaVersion
+            makeTarget(pipelineContext) {
+                preBuildAction = stageConfig.preBuildAction
+                customBuildAction = stageConfig.customBuildAction
+                postSuccessfulBuildAction = stageConfig.postSuccessfulBuildAction
+                postFailedBuildAction = stageConfig.postFailedBuildAction
+                postSuccessfulBuildAction = stageConfig.postSuccessfulBuildAction
+                postBuildAction = stageConfig.postBuildAction
+                target = stageConfig.target
+                hasJUnit = stageConfig.hasJUnit
+                h2o3dir = h2oFolder
+                archiveAdditionalFiles = stageConfig.archiveAdditionalFiles
+                excludeAdditionalFiles = stageConfig.excludeAdditionalFiles
+                makefilePath = stageConfig.makefilePath
+                archiveFiles = stageConfig.archiveFiles
+                activatePythonEnv = stageConfig.activatePythonEnv
+                javaVersion = stageConfig.javaVersion
+            }
         }
     }
 }
@@ -69,7 +70,7 @@ def installXGBWheel(final String xgbVersion, final String h2o3dir) {
         echo "Activating Python ${env.PYTHON_VERSION}"
         . /envs/h2o_env_python${env.PYTHON_VERSION}/bin/activate
 
-        pip install ${h2o3dir}/xgb-whls/xgboost_ompv4-${xgbVersion}-cp${env.PYTHON_VERSION.replaceAll('\\.','')}-*-linux_x86_64.whl
+        pip install ${h2o3dir}/xgb-whls/xgboost_ompv4-${xgbVersion}-cp${env.PYTHON_VERSION.replaceAll('\\.', '')}-*-linux_x86_64.whl
     """
 }
 

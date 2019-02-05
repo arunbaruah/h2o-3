@@ -42,7 +42,7 @@ def call(final pipelineContext) {
     ],
     [
       stageName: 'Java 8 Smoke', target: 'test-junit-smoke-jenkins', javaVersion: 8, timeoutValue: 20,
-      component: pipelineContext.getBuildConfig().COMPONENT_JAVA,, tier: pipelineContext.POD_TIER_MEDIUM
+      component: pipelineContext.getBuildConfig().COMPONENT_JAVA, tier: pipelineContext.POD_TIER_MEDIUM
     ],
      [
        stageName: 'Java 10 Smoke', target: 'test-junit-10-smoke-jenkins', javaVersion: 10, timeoutValue: 20,
