@@ -20,7 +20,7 @@ spec:
     command:
     - /bin/sh
     - -c
-    image: harbor.h2o.ai/opsh2oai/h2o-3/dev-release-gradle-4.10.1:8
+    image: harbor.h2o.ai/opsh2oai/h2o-3/dev-build-gradle-4.10.1:8
     imagePullPolicy: Always
     name: h2o-3-container
     resources:
