@@ -434,6 +434,17 @@ def import_file(path=None, destination_frame=None, parse=True, header=0, sep=Non
         return H2OFrame()._import_parse(path, pattern, destination_frame, header, sep, col_names, col_types, na_strings, skipped_columns)
 
 
+def import_hive_table(database, table, columns=None):
+    
+    assert_is_type(database, str)
+    assert_is_type(table, str)
+    assert_is_type(columns, [str], None)
+    p = {"database": database, "table": table }
+    if columns:
+        p["columns"] = ", ".join(columns)
+    j = H2OJob(api("POST /99/ImportHiveTable", data=p), "Import Hive Table").poll()
+    return get_frame(j.dest_key)
+
 def import_sql_table(connection_url, table, username, password, columns=None, optimize=True, fetch_mode=None):
     """
     Import SQL table to H2OFrame in memory.

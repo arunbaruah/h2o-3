@@ -9,7 +9,7 @@ import water.exceptions.H2OIllegalArgumentException;
 import water.fvec.Frame;
 import water.parser.*;
 
-class ParseHandler extends Handler {
+public class ParseHandler extends Handler {
   // Entry point for parsing.
   @SuppressWarnings("unused") // called through reflection by RequestServer
   public ParseV3 parse(int version, ParseV3 parse) {
