@@ -12,7 +12,7 @@ spec:
     command:
     - /bin/sh
     - -c
-    image: harbor.h2o.ai/opsh2oai/h2o-3/dev-build-gradle-4.10.1:8
+    image: !IMAGE_SUBST!
     imagePullPolicy: Always
     name: h2o-3-container
     resources:

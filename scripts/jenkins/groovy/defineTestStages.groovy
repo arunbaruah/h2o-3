@@ -555,7 +555,7 @@ private void invokeStage(final pipelineContext, final body) {
   if (pipelineContext.getBuildConfig().componentChanged(config.component)) {
     def stageClosure = {
         pipelineContext.getBuildSummary().addStageSummary(this, config.stageName, config.stageDir)
-        pipelineContext.insidePod(this, config.tier) {
+        pipelineContext.insidePod(this, config.image, config.tier) {
         if (params.executeFailedOnly && pipelineContext.getUtils().wasStageSuccessful(this, config.stageName)) {
           echo "###### Stage was successful in previous build ######"
           pipelineContext.getBuildSummary().setStageDetails(this, config.stageName, 'Skipped', 'N/A')

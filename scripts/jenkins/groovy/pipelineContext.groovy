@@ -110,10 +110,16 @@ class PipelineContext {
 
     }
 
-    void insidePod(final context, final tier, final Closure body) {
+    void insidePod(final context, final tier, final image, final Closure body) {
         if (POD_TIERS.contains(tier)) {
             final def label = "h2o-3-pod-${tier}-${UUID.randomUUID().toString()}"
-            context.podTemplate(label: label, name: "h2o-3-pod-${tier}", yaml: podTemplates[tier]) {
+            def podSpec
+            if (podTemplates[tier]) {
+                podSpec = podTemplates[tier].replaceAll('!IMAGE_SUBST!', image)
+            } else {
+                context.error "Cannot find pod template for tier ${tier}"
+            }
+            context.podTemplate(label: label, name: "h2o-3-pod-${tier}", yaml: podSpec) {
                 context.node(label) {
                     context.container(DEFAULT_POD_CONTAINER) {
                         context.withCredentials([context.file(credentialsId: 'c096a055-bb45-4dac-ba5e-10e6e470f37e', variable: 'JUNIT_CORE_SITE_PATH'), [$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS S3 Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
